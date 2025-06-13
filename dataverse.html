@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,16 +6,32 @@
     async function redirect() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
-      if (!id) return;
+      if (!id) {
+        document.body.innerText = "Missing ID.";
+        return;
+      }
 
-      const response = await fetch(`https://337123657c26e70a8c4a3f818a15b9.ca.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9642e55a505b4fe09c3ee688de1b81f0/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=33712365-7c26-e70a-8c4a-3f818a15b9ca&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xIV7AhVEfadRG854MTGqJGh3AqCLARo-0p7LIiFxIDU&id=${id}`);
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        document.body.innerText = "Redirect failed.";
+      try {
+        const response = await fetch("https://337123657c26e70a8c4a3f818a15b9.ca.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9642e55a505b4fe09c3ee688de1b81f0/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=33712365-7c26-e70a-8c4a-3f818a15b9ca&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xIV7AhVEfadRG854MTGqJGh3AqCLARo-0p7LIiFxIDU", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id })
+        });
+
+        const data = await response.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          document.body.innerText = "Redirect failed: No URL returned.";
+        }
+      } catch (error) {
+        console.error("Redirect error:", error);
+        document.body.innerText = "Redirect failed: " + error.message;
       }
     }
+
     redirect();
   </script>
 </head>
